@@ -15,27 +15,24 @@ driver.get('http://www.facebook.com/groups/');
 
 
 let getLinksGroups = (() => {
-	return new Promise(resolve => {
-		driver.findElement({ css: '.uiList.mam._509-._4ki._4ks' }).then((ncol) => {
-			ncol.findElements({ xpath: './li' }).then((lis) => {
-				lis.map((elem, index, lis) => {
-					lis[index].findElements({ css: 'li>ul>li' }).then((lisgroups) => {
-						var arrLinkGroups = lisgroups.map((elem1, index1, lisgroups) => {
-							elem1.getAttribute("id").then((idattr) => {
-								return /[^\_]+\_([^\n]+)/.exec(idattr)[1];
-							});
+	driver.findElement({ css: '.uiList.mam._509-._4ki._4ks' }).then((ncol) => {
+		ncol.findElements({ xpath: './li' }).then((lis) => {
+			let promiseone = lis.map((elem, index, lis) => {
+				lis[index].findElements({ css: 'li>ul>li' }).then((lisgroups) => {
+					let arrLinkGroups = lisgroups.map(async (elem1, index1, lisgroups) => {
+						elem1.getAttribute("id").then((idattr) => {
+							return /[^\_]+\_([^\n]+)/.exec(idattr)[1];
 						});
 					});
 				});
 			});
+			Promise.all(promiseone).then( );
 		});
 	});
-})
+});
 
 driver.wait(until.elementLocated({ css: '._38my' })).then(() => {
-	getLinksGroups().then((linkGroups) => {
-		console.log(linkGroups);
-	});
+	getLinksGroups();
 });
 
 setTimeout(() => {
