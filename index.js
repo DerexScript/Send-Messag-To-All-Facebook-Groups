@@ -15,15 +15,17 @@ driver.get('http://www.facebook.com/groups/');
 
 
 let getLinksGroups = (() => {
-	driver.findElement({ css: '.uiList.mam._509-._4ki._4ks' }).then((ncol) => {
-		ncol.findElements({ xpath: './li' }).then((lis) => {
-			lis.map((elem, index, lis) => {
-				lis[index].findElements({ css: 'li>ul>li' }).then((lisgroups) => {
-					lisgroups.map((elem1, index1, lisgroups) => {
-						elem1.getAttribute("id").then((idattr) => {
-							return /[^\_]+\_([^\n]+)/.exec(idattr)[1];
-						});
-					})
+	return new Promise(resolve => {
+		driver.findElement({ css: '.uiList.mam._509-._4ki._4ks' }).then((ncol) => {
+			ncol.findElements({ xpath: './li' }).then((lis) => {
+				lis.map((elem, index, lis) => {
+					lis[index].findElements({ css: 'li>ul>li' }).then((lisgroups) => {
+						lisgroups.map((elem1, index1, lisgroups) => {
+							elem1.getAttribute("id").then((idattr) => {
+								return /[^\_]+\_([^\n]+)/.exec(idattr)[1];
+							});
+						})
+					});
 				});
 			});
 		});
@@ -31,7 +33,9 @@ let getLinksGroups = (() => {
 });
 
 driver.wait(until.elementLocated({ css: '._38my' })).then(() => {
-	getLinksGroups();
+	getLinksGroups().then((vetorlinks)=>{
+		console.log(vetorlinks.length);
+	});
 });
 
 setTimeout(() => {
