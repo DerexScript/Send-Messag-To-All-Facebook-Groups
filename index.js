@@ -13,7 +13,7 @@ let driver = new webdriver.Builder()
 
 driver.get('http://www.facebook.com/groups/');
 
-let getLinksGroups = (() => {
+let getLinksGroups11 = (() => {
 	return new Promise(async resolve => {
 		let liDir = await driver.findElement({ css: '.uiList.mam._509-._4ki._4ks' });
 		let nLi = await liDir.findElements({ xpath: './li' });
@@ -24,9 +24,20 @@ let getLinksGroups = (() => {
 	})
 });
 
+const getLinksGroups = () => new Promise((resolve, reject) => {
+    driver
+        .findElement({ css: '.uiList.mam._509-._4ki._4ks' })
+        .findElements({ xpath: './li' })
+        .then(nLi => Promise.all(nLi
+            .map(element => element.findElements({ css: 'li>ul>li' }))))
+        .then(resolve)
+        .catch(reject);
+});
+
+
 driver.wait(until.elementLocated({ css: '._38my' })).then(() => {
-	getLinksGroups().then((asd)=>{
-		
+	getLinksGroups().then((Arrlinks)=>{
+		console.log(Arrlinks);
 	})
 });
 
