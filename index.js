@@ -2,57 +2,60 @@ const webdriver = require('selenium-webdriver'),
 	By = webdriver.By,
 	until = webdriver.until,
 	keys = webdriver.keys;
-let chrome = require('selenium-webdriver/chrome');
-let options = new chrome.Options();
+const chrome = require('selenium-webdriver/chrome');
+const options = new chrome.Options();
 
 options.addArguments("user-data-dir=c:/Users/Derex/AppData/Local/Google/Chrome/User Data/DC/");
-let driver = new webdriver.Builder()
+const driver = new webdriver.Builder()
 	.forBrowser('chrome')
 	.setChromeOptions(options)
 	.build();
 
 driver.get('http://www.facebook.com/groups/');
 
-let flatten = (arr => {
+const flatten = (arr => {
 	return arr.reduce((previous, current) => previous.concat(current), []);
 });
 
-let extractElement = (arr => {
-	return Promise.all(arr
+const extractElement = arr => {
+	return arr
 		.map(async elem => 'https://www.facebook.com/groups/' + /[^\_]+\_([^\n]+)/
-			.exec(await elem.getAttribute('id'))[1]))
-});
+			.exec(await elem.getAttribute('id'))[1])
+};
 
-let getLinksGroups = () => new Promise((resolve, reject) => {
-	driver
+const getLinksGroups = async () => {
+	const nLi = await driver
 		.findElement({ css: '.uiList.mam._509-._4ki._4ks' })
 		.findElements({ xpath: './li' })
-		.then(nLi => Promise.all(nLi
-			.map(element => element.findElements({ css: 'li>ul>li' }))))
-		.then(arrElem => flatten(arrElem))
-		.then(adsad => extractElement(adsad))
-		.then(links => browseGroups(links))
-		.then(resolve)
-		.then(reject);
-});
+	nLi.forEach(async element => {
+		const vLI = await element.findElements({ css: 'li>ul>li' })
+		const vl1 = flatten(vLI)
+		const vl2 = extractElement(vl1)
+		browseGroups(vl2);
+	})
+};
 
-let sendMsg = () => new Promise(async (resolve, reject) => {
-	await driver.wait(until.elementsLocated({ css: '._4h97._30z._4h96' }));
-	await driver.findElement({ css: '._4h98' }).click();
-	await driver.wait(until.elementsLocated({ css: '._1mf._1mj' }));
-	await driver.executeScript('let text = document.querySelector("._1mf._1mj");text.innerHTML = `testt`;event = document.createEvent("UIEvents");event.initUIEvent("input", true, true, window, 1);text.dispatchEvent(event);')
-	resolve();
-})
+const sendMsg = async () => {
+	try {
+		await driver.wait(until.elementsLocated({ css: '._4h97._30z._4h96' }));
+		await driver.findElement({ css: '._4h98' }).click();
+		await driver.wait(until.elementsLocated({ css: '._1mf._1mj' }));
+		await driver.executeScript('const text = document.querySelector("._1mf._1mj");text.innerHTML = `testt`;event = document.createEvent("UIEvents");event.initUIEvent("input", true, true, window, 1);text.dispatchEvent(event);')
+	} catch (error) {
+		console.log(error);
+	}
+}
 
-let browseGroups = (arr) => new Promise((resolve, reject) => {
-	arr.map((elem, index) => driver
-		.get(elem)
-		.then(driver.wait(until.elementLocated({ css: '#seo_h1_tag' })))
-		.then(sndtext => sendMsg(sndtext))
-		.then(resolve));
-});
+const browseGroups = async (arr) => {
+	arr.forEach(async (elem, index) => {
+		driver.get(elem);
+		pageElem();
+		await sendMsg();
+	})
+}
 
 driver.wait(until.elementLocated({ css: '._38my' })).then(() => {
 	getLinksGroups()
-		.then(arrLinks => console.log(arrLinks));
+		.then(arrLinks => console.log(arrLinks))
+		.catch(console.log);
 });
