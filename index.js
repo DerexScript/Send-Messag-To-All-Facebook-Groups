@@ -29,10 +29,7 @@ const getLinksGroups = (msg) => new Promise((resolve, reject) => {
 		.findElements({ xpath: './li' })
 		.then(nLi => Promise.all(nLi
 			.map(element => element.findElements({ css: 'li>ul>li' }))))
-		.then(arrElem => flatten(arrElem))
-		.then(extractElem => extractElement(extractElem))
-		.then(Arrlinks => browseGroups(Arrlinks, msg))
-		.then(resolve)
+		.then(arrElem => resolve(arrElem))
 		.then(reject);
 });
 
@@ -42,12 +39,12 @@ const sendMsg = (msg) => new Promise(async (resolve) => {
 	await driver.wait(until.elementsLocated({ css: '._1mf._1mj' }), 2500);
 	await driver.executeScript(`const text = document.querySelector("._1mf._1mj");text.innerHTML = '${msg}';event = document.createEvent("UIEvents");event.initUIEvent("input", true, true, window, 1);text.dispatchEvent(event); return 0;`);
 	const btnSendMsg = await driver.findElement({ css: '._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft' });
-	/*setTimeout(async () => {
+	setTimeout(async () => {
 		await btnSendMsg.click()
 			.then(() => {
 				Console.log('Enviado!');
 			}).catch(error => btnSendMsg.submit());
-	}, 1000);*/
+	}, 1000);
 	setTimeout(() => {
 		resolve();
 	}, 5000)
@@ -62,7 +59,8 @@ const browseGroups = async (arr, msg) => {
 }
 
 driver.wait(until.elementLocated({ css: '._38my' })).then(() => {
-	getLinksGroups("Olá Pessoal!")
-		.then(arrLinks => console.log("arrLinks"))
-		.catch(console.log);
+	getLinksGroups()
+	.then(arrElem => flatten(arrElem))
+	.then(extractElem => extractElement(extractElem))
+	.then(Arrlinks => browseGroups(Arrlinks, "Olá Povo Bonito!"));
 });
