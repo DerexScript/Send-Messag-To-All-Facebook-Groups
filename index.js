@@ -23,39 +23,46 @@ const extractElement = arr => {
 			.exec(await elem.getAttribute('id'))[1])
 };
 
-const getLinksGroups = async () => {
-	const nLi = await driver
+const getLinksGroups = (msg) => new Promise((resolve, reject) => {
+	driver
 		.findElement({ css: '.uiList.mam._509-._4ki._4ks' })
 		.findElements({ xpath: './li' })
-	nLi.forEach(async element => {
-		const vLI = await element.findElements({ css: 'li>ul>li' })
-		const vl1 = flatten(vLI)
-		const vl2 = extractElement(vl1)
-		browseGroups(vl2);
-	})
-};
+		.then(nLi => Promise.all(nLi
+			.map(element => element.findElements({ css: 'li>ul>li' }))))
+		.then(arrElem => flatten(arrElem))
+		.then(extractElem => extractElement(extractElem))
+		.then(Arrlinks => browseGroups(Arrlinks, msg))
+		.then(resolve)
+		.then(reject);
+});
 
-const sendMsg = async () => {
-	try {
-		await driver.wait(until.elementsLocated({ css: '._4h97._30z._4h96' }));
-		await driver.findElement({ css: '._4h98' }).click();
-		await driver.wait(until.elementsLocated({ css: '._1mf._1mj' }));
-		await driver.executeScript('const text = document.querySelector("._1mf._1mj");text.innerHTML = `testt`;event = document.createEvent("UIEvents");event.initUIEvent("input", true, true, window, 1);text.dispatchEvent(event);')
-	} catch (error) {
-		console.log(error);
+const sendMsg = (msg) => new Promise(async (resolve) => {
+	await driver.wait(until.elementsLocated({ css: '._4h97._30z._4h96' }));
+	await driver.findElement({ css: '._4h98' }).click();
+	await driver.wait(until.elementsLocated({ css: '._1mf._1mj' }), 2500);
+	await driver.executeScript(`const text = document.querySelector("._1mf._1mj");text.innerHTML = '${msg}';event = document.createEvent("UIEvents");event.initUIEvent("input", true, true, window, 1);text.dispatchEvent(event); return 0;`);
+	const btnSendMsg = await driver.findElement({ css: '._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft' });
+	/*setTimeout(async () => {
+		await btnSendMsg.click()
+			.then(() => {
+				Console.log('Enviado!');
+			}).catch(error => btnSendMsg.submit());
+	}, 1000);*/
+	setTimeout(() => {
+		resolve();
+	}, 5000)
+})
+
+const browseGroups = async (arr, msg) => {
+	console.log(await arr.length);
+	for (let i = 0; i < await arr.length; i++) {
+		driver.get(arr[i]);
+		await sendMsg(msg);
 	}
 }
 
-const browseGroups = async (arr) => {
-	arr.forEach(async (elem, index) => {
-		driver.get(elem);
-		pageElem();
-		await sendMsg();
-	})
-}
-
 driver.wait(until.elementLocated({ css: '._38my' })).then(() => {
-	getLinksGroups()
-		.then(arrLinks => console.log(arrLinks))
+	getLinksGroups("Olá Pessoal!")
+		.then(arrLinks => console.log("arrLinks"))
 		.catch(console.log);
 });
