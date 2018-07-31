@@ -5,7 +5,8 @@ const webdriver = require('selenium-webdriver'),
 const chrome = require('selenium-webdriver/chrome');
 const options = new chrome.Options();
 
-options.addArguments("user-data-dir=c:/Users/Derex/AppData/Local/Google/Chrome/User Data/DC/");
+//options.addArguments("user-data-dir=c:/Users/Derex/AppData/Local/Google/Chrome/User Data/DC/");
+options.addArguments("user-data-dir=c:/Users/Derex/AppData/Local/Google/Chrome/User Data/SK/");
 const driver = new webdriver.Builder()
 	.forBrowser('chrome')
 	.setChromeOptions(options)
@@ -37,21 +38,20 @@ const sendMsg = (msg) => new Promise(async (resolve) => {
 	await driver.wait(until.elementsLocated({ css: '._4h97._30z._4h96' }));
 	await driver.findElement({ css: '._4h98' }).click();
 	await driver.wait(until.elementsLocated({ css: '._1mf._1mj' }), 2500);
-	await driver.executeScript(`const text = document.querySelector("._1mf._1mj");text.innerHTML = '${msg}';event = document.createEvent("UIEvents");event.initUIEvent("input", true, true, window, 1);text.dispatchEvent(event); return 0;`);
-	const btnSendMsg = await driver.findElement({ css: '._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft' });
+	await driver.executeScript("const text = document.querySelector('._1mf._1mj');text.innerText = `Clã: DsKillers\nClã Tag: #JRQYGJ9U\nLink De Convite:https://link.clashofclans.com/?action=OpenClanProfile&tag=JRQYGJ9U\nClã consistente em guerras e em jogos de clã, Fechamos todos jogos de clã!\nRecrutamos CV6+ para guerras e jogos de clã!\nNão aceitamos vilas rushadas!\nClã Forum: http://dskillers.cf/forum/`;event = document.createEvent('UIEvents');event.initUIEvent('input', true, true, window, 1);text.dispatchEvent(event); window.scrollTo(0, 400); return 0;");
 	setTimeout(async () => {
+		const btnSendMsg = await driver.findElement({ css: '._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft' });
 		await btnSendMsg.click()
 			.then(() => {
 				Console.log('Enviado!');
-			}).catch(error => btnSendMsg.submit());
+			}).catch(() => btnSendMsg.submit());
 	}, 1000);
 	setTimeout(() => {
 		resolve();
-	}, 5000)
+	}, 7000)
 })
 
 const browseGroups = async (arr, msg) => {
-	console.log(await arr.length);
 	for (let i = 0; i < await arr.length; i++) {
 		driver.get(arr[i]);
 		await sendMsg(msg);
@@ -62,5 +62,5 @@ driver.wait(until.elementLocated({ css: '._38my' })).then(() => {
 	getLinksGroups()
 	.then(arrElem => flatten(arrElem))
 	.then(extractElem => extractElement(extractElem))
-	.then(Arrlinks => browseGroups(Arrlinks, "Olá Povo Bonito!"));
+	.then(Arrlinks => browseGroups(Arrlinks, "msgm"));
 });
